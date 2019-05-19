@@ -1,0 +1,198 @@
+CellProfiler Pipeline: http://www.cellprofiler.org
+Version:3
+DateRevision:300
+GitHash:
+ModuleCount:14
+HasImagePlaneDetails:False
+
+Images:[module_num:1|svn_version:\'Unknown\'|variable_revision_number:2|show_window:False|notes:\x5B\'To begin creating your project, use the Images module to compile a list of files and/or folders that you want to analyze. You can also specify a set of rules to include only the desired files in your selected folders.\'\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True|wants_pause:False]
+    :
+    Filter images?:Images only
+    Select the rule criteria:and (extension does isimage) (directory doesnot containregexp "\x5B\\\\\\\\\\\\\\\\/\x5D\\\\\\\\.")
+
+Metadata:[module_num:2|svn_version:\'Unknown\'|variable_revision_number:4|show_window:False|notes:\x5B\'The Metadata module optionally allows you to extract information describing your images (i.e, metadata) which will be stored along with your measurements. This information can be contained in the file name and/or location, or in an external file.\'\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True|wants_pause:False]
+    Extract metadata?:No
+    Metadata data type:Text
+    Metadata types:{}
+    Extraction method count:1
+    Metadata extraction method:Extract from file/folder names
+    Metadata source:File name
+    Regular expression to extract from file name:^(?P<Plate>.*)_(?P<Well>\x5BA-P\x5D\x5B0-9\x5D{2})_s(?P<Site>\x5B0-9\x5D)_w(?P<ChannelNumber>\x5B0-9\x5D)
+    Regular expression to extract from folder name:(?P<Date>\x5B0-9\x5D{4}_\x5B0-9\x5D{2}_\x5B0-9\x5D{2})$
+    Extract metadata from:All images
+    Select the filtering criteria:and (file does contain "")
+    Metadata file location:
+    Match file and image metadata:\x5B\x5D
+    Use case insensitive matching?:No
+
+NamesAndTypes:[module_num:3|svn_version:\'Unknown\'|variable_revision_number:8|show_window:False|notes:\x5B\'The NamesAndTypes module allows you to assign a meaningful name to each image by which other modules will refer to it.\'\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True|wants_pause:False]
+    Assign a name to:All images
+    Select the image type:Grayscale image
+    Name to assign these images:DAPI
+    Match metadata:\x5B\x5D
+    Image set matching method:Order
+    Set intensity range from:Image bit-depth
+    Assignments count:1
+    Single images count:0
+    Maximum intensity:255.0
+    Process as 3D?:No
+    Relative pixel spacing in X:1.0
+    Relative pixel spacing in Y:1.0
+    Relative pixel spacing in Z:1.0
+    Select the rule criteria:and (file does contain "")
+    Name to assign these images:DNA
+    Name to assign these objects:Cell
+    Select the image type:Grayscale image
+    Set intensity range from:Image metadata
+    Maximum intensity:255.0
+
+Groups:[module_num:4|svn_version:\'Unknown\'|variable_revision_number:2|show_window:False|notes:\x5B\'The Groups module optionally allows you to split your list of images into image subsets (groups) which will be processed independently of each other. Examples of groupings include screening batches, microtiter plates, time-lapse movies, etc.\'\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True|wants_pause:False]
+    Do you want to group your images?:No
+    grouping metadata count:1
+    Metadata category:None
+
+IdentifyPrimaryObjects:[module_num:5|svn_version:\'Unknown\'|variable_revision_number:13|show_window:False|notes:\x5B\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:DAPI
+    Name the primary objects to be identified:Nuclei
+    Typical diameter of objects, in pixel units (Min,Max):15,60
+    Discard objects outside the diameter range?:Yes
+    Discard objects touching the border of the image?:Yes
+    Method to distinguish clumped objects:Intensity
+    Method to draw dividing lines between clumped objects:Propagate
+    Size of smoothing filter:8
+    Suppress local maxima that are closer than this minimum allowed distance:8
+    Speed up by using lower-resolution image to find local maxima?:No
+    Fill holes in identified objects?:After both thresholding and declumping
+    Automatically calculate size of smoothing filter for declumping?:No
+    Automatically calculate minimum allowed distance between local maxima?:No
+    Handling of objects if excessive number of objects identified:Continue
+    Maximum number of objects:500
+    Use advanced settings?:Yes
+    Threshold setting version:10
+    Threshold strategy:Global
+    Thresholding method:Otsu
+    Threshold smoothing scale:0
+    Threshold correction factor:1
+    Lower and upper bounds on threshold:0,1
+    Manual threshold:0.011
+    Select the measurement to threshold with:Intensity_MedianIntensity_DAPI
+    Two-class or three-class thresholding?:Three classes
+    Assign pixels in the middle intensity class to the foreground or the background?:Background
+    Size of adaptive window:60
+    Lower outlier fraction:0.01
+    Upper outlier fraction:0.01
+    Averaging method:Mean
+    Variance method:Standard deviation
+    # of deviations:0.5
+    Thresholding method:Otsu
+
+ExpandOrShrinkObjects:[module_num:6|svn_version:\'Unknown\'|variable_revision_number:2|show_window:False|notes:\x5B\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input objects:Nuclei
+    Name the output objects:ShrunkenNuclei
+    Select the operation:Add partial dividing lines between objects
+    Number of pixels by which to expand or shrink:20
+    Fill holes in objects so that all objects shrink to a single point?:No
+
+ConvertObjectsToImage:[module_num:7|svn_version:\'Unknown\'|variable_revision_number:1|show_window:False|notes:\x5B\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input objects:ShrunkenNuclei
+    Name the output image:SelectedNuclei
+    Select the color format:Binary (black & white)
+    Select the colormap:Default
+
+Opening:[module_num:8|svn_version:\'Unknown\'|variable_revision_number:1|show_window:False|notes:\x5B\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:SelectedNuclei
+    Name the output image:Opening
+    Structuring element:diamond,3
+
+IdentifyPrimaryObjects:[module_num:9|svn_version:\'Unknown\'|variable_revision_number:13|show_window:False|notes:\x5B\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:Opening
+    Name the primary objects to be identified:OpenedNuclei
+    Typical diameter of objects, in pixel units (Min,Max):15,60
+    Discard objects outside the diameter range?:Yes
+    Discard objects touching the border of the image?:Yes
+    Method to distinguish clumped objects:Shape
+    Method to draw dividing lines between clumped objects:Propagate
+    Size of smoothing filter:0
+    Suppress local maxima that are closer than this minimum allowed distance:5
+    Speed up by using lower-resolution image to find local maxima?:No
+    Fill holes in identified objects?:After declumping only
+    Automatically calculate size of smoothing filter for declumping?:No
+    Automatically calculate minimum allowed distance between local maxima?:No
+    Handling of objects if excessive number of objects identified:Continue
+    Maximum number of objects:500
+    Use advanced settings?:Yes
+    Threshold setting version:10
+    Threshold strategy:Global
+    Thresholding method:Otsu
+    Threshold smoothing scale:0
+    Threshold correction factor:1.0
+    Lower and upper bounds on threshold:0.0,1.0
+    Manual threshold:0.0
+    Select the measurement to threshold with:None
+    Two-class or three-class thresholding?:Two classes
+    Assign pixels in the middle intensity class to the foreground or the background?:Foreground
+    Size of adaptive window:50
+    Lower outlier fraction:0.05
+    Upper outlier fraction:0.05
+    Averaging method:Mean
+    Variance method:Standard deviation
+    # of deviations:2.0
+    Thresholding method:Otsu
+
+ExpandOrShrinkObjects:[module_num:10|svn_version:\'Unknown\'|variable_revision_number:2|show_window:False|notes:\x5B\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input objects:OpenedNuclei
+    Name the output objects:ShrunkenOpenedNuclei
+    Select the operation:Add partial dividing lines between objects
+    Number of pixels by which to expand or shrink:10
+    Fill holes in objects so that all objects shrink to a single point?:No
+
+MeasureObjectSizeShape:[module_num:11|svn_version:\'Unknown\'|variable_revision_number:1|show_window:False|notes:\x5B\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True|wants_pause:False]
+    Select objects to measure:ShrunkenOpenedNuclei
+    Calculate the Zernike features?:No
+
+ConvertObjectsToImage:[module_num:12|svn_version:\'Unknown\'|variable_revision_number:1|show_window:False|notes:\x5B\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input objects:ShrunkenOpenedNuclei
+    Name the output image:Nuclei_bin
+    Select the color format:Binary (black & white)
+    Select the colormap:Default
+
+SaveImages:[module_num:13|svn_version:\'Unknown\'|variable_revision_number:13|show_window:False|notes:\x5B\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True|wants_pause:False]
+    Select the type of image to save:Image
+    Select the image to save:Nuclei_bin
+    Select method for constructing file names:From image filename
+    Select image name for file prefix:DAPI
+    Enter single file name:OrigBlue
+    Number of digits:4
+    Append a suffix to the image file name?:No
+    Text to append to the image name:
+    Saved file format:tiff
+    Output file location:Elsewhere...\x7CF\x3A\\\\\\\\MkyFISH\\\\\\\\Definitive2\\\\\\\\MDR\\\\\\\\March2018\\\\\\\\Selected genes\\\\\\\\Declumped_brdu_nuclei
+    Image bit depth:8-bit integer
+    Overwrite existing files without warning?:No
+    When to save:Every cycle
+    Record the file and path information to the saved image?:No
+    Create subfolders in the output folder?:No
+    Base image folder:Elsewhere...\x7C
+
+ExportToSpreadsheet:[module_num:14|svn_version:\'Unknown\'|variable_revision_number:12|show_window:False|notes:\x5B\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True|wants_pause:False]
+    Select the column delimiter:Comma (",")
+    Add image metadata columns to your object data file?:Yes
+    Select the measurements to export:No
+    Calculate the per-image mean values for object measurements?:Yes
+    Calculate the per-image median values for object measurements?:Yes
+    Calculate the per-image standard deviation values for object measurements?:Yes
+    Output file location:Elsewhere...\x7CF\x3A\\\\\\\\MkyFISH\\\\\\\\Definitive2\\\\\\\\MDR\\\\\\\\March2018\\\\\\\\Selected genes
+    Create a GenePattern GCT file?:No
+    Select source of sample row name:Image filename
+    Select the image to use as the identifier:DAPI
+    Select the metadata to use as the identifier:None
+    Export all measurement types?:Yes
+    Press button to select measurements:ShrunkenOpenedNuclei\x7CLocation_Center_Y,ShrunkenOpenedNuclei\x7CLocation_Center_X,ShrunkenOpenedNuclei\x7CNumber_Object_Number,ShrunkenOpenedNuclei\x7CAreaShape_Perimeter,ShrunkenOpenedNuclei\x7CAreaShape_FormFactor,ShrunkenOpenedNuclei\x7CAreaShape_Solidity,ShrunkenOpenedNuclei\x7CAreaShape_Orientation,ShrunkenOpenedNuclei\x7CAreaShape_Center_Y,ShrunkenOpenedNuclei\x7CAreaShape_Center_X,ShrunkenOpenedNuclei\x7CAreaShape_Center_Z,ShrunkenOpenedNuclei\x7CAreaShape_Area,ShrunkenOpenedNuclei\x7CAreaShape_MinFeretDiameter,ShrunkenOpenedNuclei\x7CAreaShape_MajorAxisLength,ShrunkenOpenedNuclei\x7CAreaShape_MaxFeretDiameter,ShrunkenOpenedNuclei\x7CAreaShape_MeanRadius,ShrunkenOpenedNuclei\x7CAreaShape_EulerNumber,ShrunkenOpenedNuclei\x7CAreaShape_Eccentricity,ShrunkenOpenedNuclei\x7CAreaShape_Compactness,ShrunkenOpenedNuclei\x7CAreaShape_Extent,ShrunkenOpenedNuclei\x7CAreaShape_MedianRadius,ShrunkenOpenedNuclei\x7CAreaShape_MaximumRadius,ShrunkenOpenedNuclei\x7CAreaShape_MinorAxisLength,Image\x7CCount_ShrunkenOpenedNuclei,Image\x7CCount_Nuclei,Image\x7CCount_OpenedNuclei,Image\x7CCount_ShrunkenNuclei,Image\x7CGroup_Index,Image\x7CGroup_Number,Image\x7CWidth_DAPI,Image\x7CExecutionTime_06ExpandOrShrinkObjects,Image\x7CExecutionTime_01Images,Image\x7CExecutionTime_04Groups,Image\x7CExecutionTime_07ConvertObjectsToImage,Image\x7CExecutionTime_02Metadata,Image\x7CExecutionTime_03NamesAndTypes,Image\x7CExecutionTime_08Opening,Image\x7CExecutionTime_09IdentifyPrimaryObjects,Image\x7CExecutionTime_05IdentifyPrimaryObjects,Image\x7CExecutionTime_12ConvertObjectsToImage,Image\x7CExecutionTime_13SaveImages,Image\x7CExecutionTime_10ExpandOrShrinkObjects,Image\x7CExecutionTime_11MeasureObjectSizeShape,Image\x7CSeries_DAPI,Image\x7CFrame_DAPI,Image\x7CURL_DAPI,Image\x7CFileName_DAPI,Image\x7CScaling_DAPI,Image\x7CModuleError_07ConvertObjectsToImage,Image\x7CModuleError_01Images,Image\x7CModuleError_04Groups,Image\x7CModuleError_06ExpandOrShrinkObjects,Image\x7CModuleError_02Metadata,Image\x7CModuleError_03NamesAndTypes,Image\x7CModuleError_08Opening,Image\x7CModuleError_09IdentifyPrimaryObjects,Image\x7CModuleError_05IdentifyPrimaryObjects,Image\x7CModuleError_12ConvertObjectsToImage,Image\x7CModuleError_13SaveImages,Image\x7CModuleError_10ExpandOrShrinkObjects,Image\x7CModuleError_11MeasureObjectSizeShape,Image\x7CPathName_DAPI,Image\x7CThreshold_OrigThreshold_Nuclei,Image\x7CThreshold_OrigThreshold_OpenedNuclei,Image\x7CThreshold_SumOfEntropies_Nuclei,Image\x7CThreshold_SumOfEntropies_OpenedNuclei,Image\x7CThreshold_WeightedVariance_Nuclei,Image\x7CThreshold_WeightedVariance_OpenedNuclei,Image\x7CThreshold_FinalThreshold_Nuclei,Image\x7CThreshold_FinalThreshold_OpenedNuclei,Image\x7CMD5Digest_DAPI,Image\x7CHeight_DAPI,Experiment\x7CModification_Timestamp,Experiment\x7CPipeline_Pipeline,Experiment\x7CRun_Timestamp,Experiment\x7CCellProfiler_Version,ShrunkenNuclei\x7CLocation_Center_Y,ShrunkenNuclei\x7CLocation_Center_X,ShrunkenNuclei\x7CNumber_Object_Number,Nuclei\x7CNumber_Object_Number,Nuclei\x7CLocation_Center_Y,Nuclei\x7CLocation_Center_X,Nuclei\x7CLocation_Center_Z,OpenedNuclei\x7CLocation_Center_Y,OpenedNuclei\x7CLocation_Center_X,OpenedNuclei\x7CLocation_Center_Z,OpenedNuclei\x7CNumber_Object_Number
+    Representation of Nan/Inf:NaN
+    Add a prefix to file names?:Yes
+    Filename prefix:Mky_FISH_march2018_
+    Overwrite existing files without warning?:Yes
+    Data to export:Do not use
+    Combine these object measurements with those of the previous object?:No
+    File name:DATA.csv
+    Use the object name for the file name?:Yes
