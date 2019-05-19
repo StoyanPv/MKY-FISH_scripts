@@ -1,0 +1,94 @@
+---
+title: "ROC Curve analysis of manually classified cellular masks"
+output:
+  html_document:
+    df_print: paged
+  html_notebook: default
+  pdf_document: default
+---
+
+# Training of the counting algorithm.
+The limits for acceptance of positivity were selected after a ROC analysis (Feinstein 2002) of the measurements from ~300 random cellular masks from random images. 
+We measured Mean grey value, Integrated density and thresholded Area fraction within the masks and compared them to the classification by an experienced researcher on the original and SME-projected images, which was used as “ground truth” (“golden standard”).
+
+```{r}
+#loading needed libraries
+require(tidyverse)
+require(pROC)
+require(Epi)
+
+```
+
+1. Measurements and correspnding manual classification is loaded in three separate dataframes: for mRNA FISH, Cytoplasmic antigen and Nuclear antigen channel. The assigned by the operator class is in column "logic...". 
+```{r}
+load("training_data_june2018.RData", verbose = T)
+```
+
+2. Constructing ROC-curves 
+With the help of the pROC library we construct the Receiver Operating Characteristics curves for the selected measurements in each channel separately: Mean grey value, Raw Integrated Density and Thresholded Area fraction:
+
+```{r}
+roc_Zscore_fish_jun2018 <- roc(logicFISH ~ Mean+RawIntDen+frArea+li_thr_frArea, data = Z_score_FISH_pattern_jun2018_only_man)
+roc_Zscore_ihc_jun2018 <- roc(logicIHC ~ Mean+RawIntDen+frArea+li_thr_frArea, data = Z_score_IHC_pattern_jun2018_only_man)
+roc_Zscore_brdu_jun2018 <- roc(logicBrdU ~ Mean+RawIntDen+frArea+li_thr_frArea, data = Z_score_BrdU_pattern_jun2018_only_man)
+
+```
+
+3. Evaluation of the ROC curves
+First we plotted the three ROC curves (specificity vs sensitivity) for each channel type. The curves are smoothed by binormal smoothing implemented in the pROC library:
+```{r}
+plot(smooth(roc_Zscore_fish_jun2018$Mean))
+lines.roc(smooth(roc_Zscore_fish_jun2018$RawIntDen), col = "green")
+lines.roc(smooth(roc_Zscore_fish_jun2018$li_thr_frArea), col = "red")
+legend(legend = c("Mean Grey Value", "Raw Integrated Density", "Thresholded Area Fraction"),fill = c("black", "green", "red"),x = "bottomright")
+title(main = "mRNA FISH")
+
+```
+
+```{r}
+plot(smooth(roc_Zscore_ihc_jun2018$Mean))
+lines.roc(smooth(roc_Zscore_ihc_jun2018$RawIntDen), col = "green")
+lines.roc(smooth(roc_Zscore_ihc_jun2018$li_thr_frArea), col = "red")
+legend(legend = c("Mean Grey Value", "Raw Integrated Density", "Thresholded Area Fraction"),fill = c("black", "green", "red"),x = "bottomright")
+title(main = "Cytoplasmic antigen")
+```
+
+```{r}
+plot(smooth(roc_Zscore_brdu_jun2018$Mean))
+lines.roc(smooth(roc_Zscore_brdu_jun2018$RawIntDen), col = "green")
+lines.roc(smooth(roc_Zscore_brdu_jun2018$li_thr_frArea), col = "red")
+legend(legend = c("Mean Grey Value", "Raw Integrated Density", "Thresholded Area Fraction"),fill = c("black", "green", "red"),x = "bottomright")
+title(main = "Nuclear antigen")
+```
+
+The value of the selected features as a binary predictor was analysed separately for the different channel classes (mRNA FISH channels, Cytoplasmic antigen channels and the Nuclear antigen channels). Each of those features were found to be good enough predictors of the “ground truth” (Table 1). For simplicity of the implementation we chose the fraction of the thresholded area as a predictor. 
+Next the area under the nonsmoothed curve for Mean grey value as main classification test is calculated and confidence intervals are constructed via bootstrapping with 10^5 resamples. The same bootstrapping strategy is used to find the threshold which maximizes the sum of Sensitivity and Specificity of the classificator
+```{r}
+# mRNA FISH channel
+auc(roc_Zscore_fish_jun2018$li_thr_frArea)
+ci(roc_Zscore_fish_jun2018$li_thr_frArea,boot.n = 100000)
+ci.thresholds(roc_Zscore_fish_jun2018$li_thr_frArea, thresholds = "best",boot.n = 100000 )
+
+
+```
+```{r}
+# Cellular antigen channel
+auc(roc_Zscore_ihc_jun2018$li_thr_frArea)
+ci(roc_Zscore_ihc_jun2018$li_thr_frArea,boot.n = 100000)
+ci.thresholds(roc_Zscore_ihc_jun2018$li_thr_frArea, thresholds = "best",boot.n = 100000 )
+
+
+```
+
+```{r}
+# Nuclear antigen channel
+auc(roc_Zscore_brdu_jun2018$li_thr_frArea)
+ci(roc_Zscore_brdu_jun2018$li_thr_frArea,boot.n = 100000)
+ci.thresholds(roc_Zscore_brdu_jun2018$li_thr_frArea, thresholds = "best",boot.n = 100000 )
+
+
+```
+The “nuclear antigen channel”contains images marked for either BrdU or Ki67. The number of positive cells is extremely low and whence the wide confidence intervals for the area under the curve for those images.
+Due to the small number of positives in the training data for the nuclear antigen channel the ROC curve is not interpretable. Which is why we chose a reasonably high threshold for positivity at 30% coverage of the masks.
+
+
