@@ -83,7 +83,7 @@ macro "Batch Convert to TIFF" {convert("tif");}
 
 // *** Insertion specific operations ***
 
-run("Non-local Means Denoising", "sigma=15 smoothing_factor=1 ");
+run("Non-local Means Denoising", "sigma=15 smoothing_factor=1 auto");
 
 // *** End Insertion specific operations ***
 

@@ -1,9 +1,9 @@
 
 inputDir = getDirectory("Choose composite image directory! ");
-chDir1 = getDirectory("Choose directory to save ch1! ");
-chDir2 = getDirectory("Choose directory to save ch2! ");
-chDir3 = getDirectory("Choose directory to save ch3! ");
-chDir4 = getDirectory("Choose directory to save ch4! ");
+chDir1 = getDirectory("Choose directory to save DAPI-channel!");
+chDir2 = getDirectory("Choose directory to save AF488-channel!");
+chDir3 = getDirectory("Choose directory to save Cy3-channel!");
+chDir4 = getDirectory("Choose directory to save AF647-channel!");
 
 fileList1 = getFileList(inputDir);
 
